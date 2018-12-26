@@ -1,0 +1,55 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        //C++代码加入
+        externalNativeBuild {
+            cmake {
+                cppFlags "-frtti -fexceptions"  //加入默认的库
+                abiFilters 'armeabi'    //设置过滤，手机只需要 arm 平台
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    //C++代码加入
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt" //CMakeLists的路径
+        }
+    }
+
+    /**
+     * 设置 jni 目录路径，默认就是这个地址（src/main/jniLibs），默认地址可以不加
+     */
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
