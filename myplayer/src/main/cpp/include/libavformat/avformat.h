@@ -2188,7 +2188,7 @@ AVInputFormat *av_probe_input_format3(AVProbeData *pd, int is_opened, int *score
  * @param pb the bytestream to probe
  * @param fmt the input format is put here
  * @param url the url of the stream
- * @param logctx the log context
+ * @param logctx the com.test.myplayer.log context
  * @param offset the offset within the bytestream to probe from
  * @param max_probe_size the maximum probe buffer size (zero for default)
  * @return the score in case of success, a negative value corresponding to an
@@ -2666,7 +2666,7 @@ int av_get_output_timestamp(struct AVFormatContext *s, int stream,
 void av_hex_dump(FILE *f, const uint8_t *buf, int size);
 
 /**
- * Send a nice hexadecimal dump of a buffer to the log.
+ * Send a nice hexadecimal dump of a buffer to the com.test.myplayer.log.
  *
  * @param avcl A pointer to an arbitrary struct of which the first field is a
  * pointer to an AVClass struct.
@@ -2691,7 +2691,7 @@ void av_pkt_dump2(FILE *f, const AVPacket *pkt, int dump_payload, const AVStream
 
 
 /**
- * Send a nice dump of a packet to the log.
+ * Send a nice dump of a packet to the com.test.myplayer.log.
  *
  * @param avcl A pointer to an arbitrary struct of which the first field is a
  * pointer to an AVClass struct.

@@ -121,7 +121,7 @@ typedef struct AVDiracSeqHeader {
  *            av_free().
  * @param buf the data buffer
  * @param buf_size the size of the data buffer in bytes
- * @param log_ctx if non-NULL, this function will log errors here
+ * @param log_ctx if non-NULL, this function will com.test.myplayer.log errors here
  * @return 0 on success, a negative AVERROR code on failure
  */
 int av_dirac_parse_sequence_header(AVDiracSeqHeader **dsh,

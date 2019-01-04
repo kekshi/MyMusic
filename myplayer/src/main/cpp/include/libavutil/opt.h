@@ -376,7 +376,7 @@ typedef struct AVOptionRanges {
  * options for which it is opt->flags & req_flags.
  * @param rej_flags rejected flags for the options to show. Show only the
  * options for which it is !(opt->flags & req_flags).
- * @param av_log_obj log context to use for showing the options
+ * @param av_log_obj com.test.myplayer.log context to use for showing the options
  */
 int av_opt_show2(void *obj, void *av_log_obj, int req_flags, int rej_flags);
 

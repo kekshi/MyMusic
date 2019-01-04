@@ -6208,7 +6208,7 @@ unsigned int av_xiphlacing(unsigned char *s, unsigned int v);
  * a pointer to an AVClass struct
  * @param[in] feature string containing the name of the missing feature
  * @param[in] want_sample indicates if samples are wanted which exhibit this feature.
- * If want_sample is non-zero, additional verbiage will be added to the log
+ * If want_sample is non-zero, additional verbiage will be added to the com.test.myplayer.log
  * message which tells the user how to report samples to the development
  * mailing list.
  * @deprecated Use avpriv_report_missing_feature() instead.

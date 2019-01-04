@@ -41,7 +41,7 @@
  * @param[in] str the string to parse: it has to be a string in the format
  * num:den, a float number or an expression
  * @param[in] max the maximum allowed numerator and denominator
- * @param[in] log_offset log level offset which is applied to the log
+ * @param[in] log_offset com.test.myplayer.log level offset which is applied to the com.test.myplayer.log
  * level of log_ctx
  * @param[in] log_ctx parent logging context
  * @return >= 0 on success, a negative error code otherwise

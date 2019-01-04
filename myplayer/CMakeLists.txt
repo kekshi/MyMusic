@@ -60,16 +60,20 @@ add_library( # Sets the name of the library.
         # Sets the library as a shared library.
         SHARED
 
+        #每次添加了 C 文件，这里别忘了加上
         # Provides a relative path to your source file(s).
-        src/main/cpp/native-lib.cpp)
+        src/main/cpp/native-lib.cpp
+        src/main/cpp/WlAudio.cpp
+        src/main/cpp/WlCallJava.cpp
+        src/main/cpp/WlFFmpeg.cpp)
 
 #复用已经存在的动态库
 #find_library( # Sets the name of the path variable.
-#        log-lib #别名
+#        com.test.myplayer.log-lib #别名
 
 # Specifies the name of the NDK library that
 # you want CMake to locate.
-#        log)
+#        com.test.myplayer.log)
 
 #连接动态库
 target_link_libraries( # Specifies the target library.
@@ -81,8 +85,8 @@ target_link_libraries( # Specifies the target library.
         avutil-55
         swresample-2
         swscale-4
-        # Links the target library to the log library
+        # Links the target library to the com.test.myplayer.log library
         # included in the NDK.
         #省略下面这句 find_library 代码块就可以省略了
-        # ${log-lib}
+        # ${com.test.myplayer.log-lib}
         log)

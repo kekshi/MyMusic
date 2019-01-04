@@ -218,14 +218,14 @@ typedef struct AVClass {
 #define AV_LOG_C(x) ((x) << 8)
 
 /**
- * Send the specified message to the log if the level is less than or equal
+ * Send the specified message to the com.test.myplayer.log if the level is less than or equal
  * to the current av_log_level. By default, all logging messages are sent to
  * stderr. This behavior can be altered by setting a different logging callback
  * function.
  * @see av_log_set_callback
  *
  * @param avcl A pointer to an arbitrary struct of which the first field is a
- *        pointer to an AVClass struct or NULL if general log.
+ *        pointer to an AVClass struct or NULL if general com.test.myplayer.log.
  * @param level The importance level of the message expressed using a @ref
  *        lavu_log_constants "Logging Constant".
  * @param fmt The format string (printf-compatible) that specifies how
@@ -235,7 +235,7 @@ void av_log(void *avcl, int level, const char *fmt, ...) av_printf_format(3, 4);
 
 
 /**
- * Send the specified message to the log if the level is less than or equal
+ * Send the specified message to the com.test.myplayer.log if the level is less than or equal
  * to the current av_log_level. By default, all logging messages are sent to
  * stderr. This behavior can be altered by setting a different logging callback
  * function.
@@ -252,16 +252,16 @@ void av_log(void *avcl, int level, const char *fmt, ...) av_printf_format(3, 4);
 void av_vlog(void *avcl, int level, const char *fmt, va_list vl);
 
 /**
- * Get the current log level
+ * Get the current com.test.myplayer.log level
  *
  * @see lavu_log_constants
  *
- * @return Current log level
+ * @return Current com.test.myplayer.log level
  */
 int av_log_get_level(void);
 
 /**
- * Set the log level
+ * Set the com.test.myplayer.log level
  *
  * @see lavu_log_constants
  *
@@ -308,7 +308,7 @@ const char* av_default_item_name(void* ctx);
 AVClassCategory av_default_get_category(void *ptr);
 
 /**
- * Format a line of log the same way as the default callback.
+ * Format a line of com.test.myplayer.log the same way as the default callback.
  * @param line          buffer to receive the formatted line
  * @param line_size     size of the buffer
  * @param print_prefix  used to store whether the prefix must be printed;
@@ -318,7 +318,7 @@ void av_log_format_line(void *ptr, int level, const char *fmt, va_list vl,
                         char *line, int line_size, int *print_prefix);
 
 /**
- * Format a line of log the same way as the default callback.
+ * Format a line of com.test.myplayer.log the same way as the default callback.
  * @param line          buffer to receive the formatted line;
  *                      may be NULL if line_size is 0
  * @param line_size     size of the buffer; at most line_size-1 characters will
@@ -329,7 +329,7 @@ void av_log_format_line(void *ptr, int level, const char *fmt, va_list vl,
  *         the number of characters that would have been written for a
  *         sufficiently large buffer, not including the terminating null
  *         character. If the return value is not less than line_size, it means
- *         that the log message was truncated to fit the buffer.
+ *         that the com.test.myplayer.log message was truncated to fit the buffer.
  */
 int av_log_format_line2(void *ptr, int level, const char *fmt, va_list vl,
                         char *line, int line_size, int *print_prefix);
@@ -359,7 +359,7 @@ int av_log_format_line2(void *ptr, int level, const char *fmt, va_list vl,
 #define AV_LOG_SKIP_REPEATED 1
 
 /**
- * Include the log severity in messages originating from codecs.
+ * Include the com.test.myplayer.log severity in messages originating from codecs.
  *
  * Results in messages such as:
  * [rawvideo @ 0xDEADBEEF] [error] encode did not produce valid pts
