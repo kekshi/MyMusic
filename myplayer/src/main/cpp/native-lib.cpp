@@ -47,8 +47,9 @@ extern "C" {
 
 
 JavaVM *javaVM = NULL;
-WlCallJava *callJava;
-WlFFmpeg *fFmpeg;
+WlCallJava *callJava = NULL;
+WlFFmpeg *fFmpeg = NULL;
+WlPlaystatus *playstatus = NULL;
 
 /**
  * 当Android的VM(Virtual Machine)执行到C组件(即*so档)里的System.loadLibrary()函数时，
@@ -80,7 +81,8 @@ Java_com_test_myplayer_player_WlPlayer_n_1parpared(JNIEnv *env, jobject instance
         if (callJava == NULL) {
             callJava = new WlCallJava(javaVM, env, &instance);
         }
-        fFmpeg = new WlFFmpeg(callJava, source);
+        playstatus = new WlPlaystatus();
+        fFmpeg = new WlFFmpeg(playstatus, callJava, source);
         fFmpeg->parpared();
     }
 

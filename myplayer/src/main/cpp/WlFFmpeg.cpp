@@ -4,25 +4,27 @@
 
 #include "WlFFmpeg.h"
 
-WlFFmpeg::WlFFmpeg(WlCallJava *callJava, const char *url) {
+WlFFmpeg::WlFFmpeg(WlPlaystatus *playstatus, WlCallJava *callJava, const char *url) {
 
     this->callJava = callJava;
     this->url = url;
-
+    this->playstatus = playstatus;
 
 }
 
+//解码回调，调用 decodeFFmpegThread() 方法实现循环解析。
 void *decodeFFmpeg(void *data) {
     WlFFmpeg *fFmpeg = (WlFFmpeg *) (data);
     fFmpeg->decodeFFmpegThread();
     pthread_exit(&fFmpeg->decodeThread);
 }
 
+//创建解析线程来解析数据，传入回调方法 decodeFFmpeg
 void WlFFmpeg::parpared() {
     pthread_create(&decodeThread, NULL, decodeFFmpeg, this);
-
 }
 
+//实际解码操作的方法
 void WlFFmpeg::decodeFFmpegThread() {
     //注册解码器并初始化网络
     av_register_all();
@@ -47,7 +49,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         //获取音频流
         if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == NULL) {
-                audio = new WlAudio();
+                audio = new WlAudio(playstatus);
                 audio->streamIndex = i;
 
                 audio->codecpar = formatContext->streams[i]->codecpar;
@@ -86,6 +88,7 @@ void WlFFmpeg::decodeFFmpegThread() {
     callJava->onCallParpared(CHILD_THREAD);
 }
 
+//开始解码
 void WlFFmpeg::start() {
     if (audio == NULL) {
         if (LOG_DEBUG) {
@@ -105,9 +108,11 @@ void WlFFmpeg::start() {
                     LOGE("解码第 %d 帧", count);
                 }
                 //释放资源
-                av_packet_free(&avPacket);
-                av_free(avPacket);
-                avPacket = NULL;
+//                av_packet_free(&avPacket);
+//                av_free(avPacket);
+//                avPacket = NULL;
+                //加入队列
+                audio->queue->putAVPacket(avPacket);
             } else {
                 //释放资源
                 av_packet_free(&avPacket);
@@ -121,5 +126,17 @@ void WlFFmpeg::start() {
             avPacket = NULL;
             break;
         }
+    }
+
+    //模拟出队，仅用来测试
+    while (audio->queue->getQueueSize() > 0) {
+        AVPacket *avPacket = av_packet_alloc();
+        audio->queue->getAVPacket(avPacket);
+        av_packet_free(&avPacket);
+        av_free(avPacket);
+        avPacket = NULL;
+    }
+    if (LOG_DEBUG) {
+        LOGD("解码完成");
     }
 }

@@ -9,6 +9,8 @@ extern "C" {
 #include <libavcodec/avcodec.h>
 };
 
+#include "WlQueue.h"
+#include "WlPlaystatus.h"
 
 class WlAudio {
 public:
@@ -16,8 +18,10 @@ public:
     int streamIndex = -1;
     AVCodecParameters *codecpar = NULL;
     AVCodecContext *avCodecContext = NULL;
+    WlQueue *queue = NULL;
+    WlPlaystatus *playstatus = NULL;
 public:
-    WlAudio();
+    WlAudio(WlPlaystatus *playstatus);
 
     ~WlAudio();
 };
