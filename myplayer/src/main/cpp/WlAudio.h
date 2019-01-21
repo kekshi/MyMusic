@@ -7,6 +7,7 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libswresample/swresample.h>
 };
 
 #include "WlQueue.h"
@@ -20,10 +21,25 @@ public:
     AVCodecContext *avCodecContext = NULL;
     WlQueue *queue = NULL;
     WlPlaystatus *playstatus = NULL;
+
+    //用来重采样的线程
+    pthread_t thread_play;
+    AVPacket *avPacket = NULL;
+    //解码出的音频帧对象
+    AVFrame *avFrame = NULL;
+    //返回值
+    int ret = -1;
+    uint8_t *buffer = NULL;
+    int data_size=0;
+
 public:
     WlAudio(WlPlaystatus *playstatus);
 
     ~WlAudio();
+
+    void play();
+
+    int resampleAudio();
 };
 
 

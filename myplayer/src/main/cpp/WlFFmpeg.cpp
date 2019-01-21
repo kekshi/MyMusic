@@ -96,9 +96,13 @@ void WlFFmpeg::start() {
         }
         return;
     }
+
+    //在解码之前是阻塞的，因此不影响性能
+    audio->play();
+
     int count = 0;
     //暂时写个死循环
-    while (1) {
+    while (playstatus != NULL && !playstatus->exit) {
         //读取音频帧
         AVPacket *avPacket = av_packet_alloc();
         if (av_read_frame(formatContext, avPacket) == 0) {
@@ -111,7 +115,7 @@ void WlFFmpeg::start() {
 //                av_packet_free(&avPacket);
 //                av_free(avPacket);
 //                avPacket = NULL;
-                //加入队列
+                //不直接释放资源，加入队列
                 audio->queue->putAVPacket(avPacket);
             } else {
                 //释放资源
@@ -124,18 +128,25 @@ void WlFFmpeg::start() {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket = NULL;
-            break;
+            while (playstatus != NULL && !playstatus->exit) {
+                if (audio->queue->getQueueSize() > 0) {
+                    continue;
+                } else {
+                    playstatus->exit = true;
+                    break;
+                }
+            }
         }
     }
 
     //模拟出队，仅用来测试
-    while (audio->queue->getQueueSize() > 0) {
-        AVPacket *avPacket = av_packet_alloc();
-        audio->queue->getAVPacket(avPacket);
-        av_packet_free(&avPacket);
-        av_free(avPacket);
-        avPacket = NULL;
-    }
+//    while (audio->queue->getQueueSize() > 0) {
+//        AVPacket *avPacket = av_packet_alloc();
+//        audio->queue->getAVPacket(avPacket);
+//        av_packet_free(&avPacket);
+//        av_free(avPacket);
+//        avPacket = NULL;
+//    }
     if (LOG_DEBUG) {
         LOGD("解码完成");
     }

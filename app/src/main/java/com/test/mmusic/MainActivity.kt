@@ -15,18 +15,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mWlPlayer = WlPlayer()
-
+        mWlPlayer.setmWlOnParparedListener {
+            MyLog.d("调用成功")
+            mWlPlayer.start()
+        }
         mBtnStart.setOnClickListener {
             begin()
         }
     }
 
     fun begin() {
-        mWlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3")
+//        mWlPlayer.setSource("http://mpge.5nd.com/2015/2015-11-26/69708/1.mp3")
+        mWlPlayer.setSource("/mnt/shared/Other/music.mp3")
+
         mWlPlayer.parpared()
-        mWlPlayer.setmWlOnParparedListener{
-            MyLog.d("调用成功")
-            mWlPlayer.start()
-        }
+
     }
 }

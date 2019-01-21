@@ -8,6 +8,7 @@
 #include "queue"
 #include "pthread.h"
 #include "WlPlaystatus.h"
+#include "AndroidLog.h"
 
 extern "C" {
 #include <libavcodec/avcodec.h>
