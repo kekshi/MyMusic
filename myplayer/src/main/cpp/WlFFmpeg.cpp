@@ -49,7 +49,8 @@ void WlFFmpeg::decodeFFmpegThread() {
         //获取音频流
         if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == NULL) {
-                audio = new WlAudio(playstatus);
+                //传入音频流中的采样率
+                audio = new WlAudio(playstatus, formatContext->streams[i]->codecpar->sample_rate);
                 audio->streamIndex = i;
 
                 audio->codecpar = formatContext->streams[i]->codecpar;

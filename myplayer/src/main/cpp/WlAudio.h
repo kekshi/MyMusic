@@ -32,7 +32,8 @@ public:
     //返回值
     int ret = -1;
     uint8_t *buffer = NULL;
-    int data_size=0;
+    int data_size = 0;
+    int sample_rate = 0;
 
 
     //OpenSL ES 相关变量
@@ -51,7 +52,7 @@ public:
 
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 public:
-    WlAudio(WlPlaystatus *playstatus);
+    WlAudio(WlPlaystatus *playstatus,int sample_rate);
 
     ~WlAudio();
 
@@ -61,6 +62,8 @@ public:
 
     //初始化 OpenSL ES
     void initOpenSLES();
+
+    int getCurrentSampleReteForOpensles(int sample_rate);
 };
 
 
