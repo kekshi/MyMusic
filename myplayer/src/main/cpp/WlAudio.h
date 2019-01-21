@@ -12,6 +12,8 @@ extern "C" {
 
 #include "WlQueue.h"
 #include "WlPlaystatus.h"
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
 
 class WlAudio {
 public:
@@ -32,6 +34,22 @@ public:
     uint8_t *buffer = NULL;
     int data_size=0;
 
+
+    //OpenSL ES 相关变量
+    //引擎接口对象实例
+    SLObjectItf engineObject = NULL;
+    SLEngineItf engineItf = NULL;
+
+    //混音器相关对象
+    SLObjectItf outputMixObject = NULL;
+    SLEnvironmentalReverbItf outputEnvironmentalReverbItf = NULL;
+    SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
+
+    //播放器相关对象
+    SLObjectItf pcmPlayerObject = NULL;
+    SLPlayItf pclPlay = NULL;
+
+    SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 public:
     WlAudio(WlPlaystatus *playstatus);
 
@@ -40,6 +58,9 @@ public:
     void play();
 
     int resampleAudio();
+
+    //初始化 OpenSL ES
+    void initOpenSLES();
 };
 
 

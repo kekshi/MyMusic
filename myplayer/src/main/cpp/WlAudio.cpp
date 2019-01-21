@@ -15,8 +15,8 @@ WlAudio::~WlAudio() {
 }
 
 void *decodePlay(void *data) {
-    WlAudio *wlAudio = static_cast<WlAudio *>(data);
-    wlAudio->resampleAudio();
+    WlAudio *wlAudio = (WlAudio *)(data);
+    wlAudio->initOpenSLES();
     pthread_exit(&wlAudio->thread_play);
 }
 
@@ -25,7 +25,7 @@ void WlAudio::play() {
     pthread_create(&thread_play, NULL, decodePlay, this);
 }
 
-FILE *outFile = fopen("/mnt/shared/Other/music.pcm", "w");
+//FILE *outFile = fopen("/mnt/shared/Other/music.pcm", "w");
 
 /**
  * 重采样的方法
@@ -97,7 +97,7 @@ int WlAudio::resampleAudio() {
             int out_channels = av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
             data_size = nb * out_channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
 
-            fwrite(buffer, 1, data_size, outFile);
+//            fwrite(buffer, 1, data_size, outFile);
 
             if (LOG_DEBUG) {
                 LOGE("数据大小是 %d", data_size);
@@ -111,7 +111,8 @@ int WlAudio::resampleAudio() {
             avFrame = NULL;
             swr_free(&swrContext);
             swrContext = NULL;
-            //break;
+            //获取数据成功之后跳出循环
+            break;
         } else {
             av_packet_free(&avPacket);
             av_free(avPacket);
@@ -123,6 +124,79 @@ int WlAudio::resampleAudio() {
         }
     }
 
-    return 0;
+    return data_size;
 }
 
+
+//循环获取 PCM 数据，播放完后退出
+void pcmBufferCallback(SLAndroidSimpleBufferQueueItf bf, void *context) {
+    WlAudio *wlAudio = (WlAudio *) (context);
+    if (wlAudio != NULL) {
+        int buffSize = wlAudio->resampleAudio();
+        if (buffSize > 0) {
+            //入队
+            (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer, buffSize);
+        }
+    }
+}
+
+void WlAudio::initOpenSLES() {
+    SLresult result;
+    // 第一步：创建引擎
+    result = slCreateEngine(&engineObject, 0, 0, 0, 0, 0);
+    //第二步：实现（Realize）engineObject 接口对象实例化
+    result = (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+    //第三部：通过 engineObject 的 GetInterface 方法得到 engineItf 引擎对象
+    result = (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineItf);
+
+    const SLInterfaceID mids[1] = {SL_IID_ENVIRONMENTALREVERB};
+    const SLboolean mreq[1] = {SL_BOOLEAN_FALSE};
+
+    //创建混音器（参数依次为：引擎对象，SLObjectItf，变音 ID 效果的个数，SLInterfaceID，属性）步骤同上，配置参照源码
+    result = (*engineItf)->CreateOutputMix(engineItf, &outputMixObject, 1, mids, mreq);
+    (void) result;
+    result = (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    (void) result;
+    result = (*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB,
+                                              &outputEnvironmentalReverbItf);
+    if (SL_RESULT_SUCCESS == result) {
+        //设置混音器环境和属性
+        result = (*outputEnvironmentalReverbItf)->SetEnvironmentalReverbProperties(outputEnvironmentalReverbItf,
+                                                                                   &reverbSettings);
+        (void) result;
+    }
+
+
+    SLDataLocator_AndroidBufferQueue androidBufferQueue = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,//固定的
+                                                           2};//缓冲队列里的缓冲数目
+    SLDataFormat_PCM pcm = {SL_DATAFORMAT_PCM, //规定类型是 PCM
+                            2, //设置声道为2（立体声）
+                            SL_SAMPLINGRATE_44_1, //设置采样率为44100hz的频率（根据音频文件采样率来设置）
+                            SL_PCMSAMPLEFORMAT_FIXED_16, //采样位数为16位
+                            SL_PCMSAMPLEFORMAT_FIXED_16, //容器大小，和采样大小保持一致就不会失真
+                            SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT, //设置声道，2声道为 前左和前右
+                            SL_BYTEORDER_LITTLEENDIAN};//播放结束的标识
+
+    SLDataLocator_OutputMix outputMix = {SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+    SLDataSource slDataSource = {&androidBufferQueue, &pcm};
+    SLDataSink audioSink = {&outputMix, NULL};
+
+    //功能清单，我们要让播放器支持的功能
+    const SLInterfaceID ids[1] = {SL_IID_BUFFERQUEUE};
+    const SLboolean req[1] = {SL_BOOLEAN_TRUE};
+
+    //通过引擎接口对象创建播放器
+    (*engineItf)->CreateAudioPlayer(engineItf, &pcmPlayerObject, &slDataSource, &audioSink, 1, ids, req);
+    (*pcmPlayerObject)->Realize(pcmPlayerObject, SL_BOOLEAN_FALSE);
+    //得到播放器 player 接口实例
+    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_PLAY, &pclPlay);
+    //得到缓存列队 BufferQueue 实例
+    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
+    //通过 pcmBufferQueue 注册回调
+    (*pcmBufferQueue)->RegisterCallback(pcmBufferQueue, pcmBufferCallback, this);
+
+    //设置播放状态
+    (*pclPlay)->SetPlayState(pclPlay, SL_PLAYSTATE_PLAYING);
+    //执行一次回调
+    pcmBufferCallback(pcmBufferQueue, this);
+}

@@ -88,6 +88,9 @@ target_link_libraries( # Specifies the target library.
         avutil-55
         swresample-2
         swscale-4
+
+        #导入OpenSL ES
+        OpenSLES
         # Links the target library to the com.test.myplayer.log library
         # included in the NDK.
         #省略下面这句 find_library 代码块就可以省略了
