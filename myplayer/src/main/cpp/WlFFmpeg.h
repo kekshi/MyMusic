@@ -35,6 +35,10 @@ public:
 
     //开始播放
     void start();
+
+    void pause();
+
+    void resume();
 };
 
 

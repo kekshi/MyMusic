@@ -98,3 +98,21 @@ Java_com_test_myplayer_player_WlPlayer_n_1start(JNIEnv *env, jobject instance) {
         fFmpeg->start();
     }
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_test_myplayer_player_WlPlayer_n_1pause(JNIEnv *env, jobject instance) {
+
+    if (fFmpeg != NULL) {
+        fFmpeg->pause();
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_test_myplayer_player_WlPlayer_n_1resume(JNIEnv *env, jobject instance) {
+
+    if (fFmpeg != NULL) {
+        fFmpeg->resume();
+    }
+}

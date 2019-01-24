@@ -50,7 +50,7 @@ void WlFFmpeg::decodeFFmpegThread() {
         if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (audio == NULL) {
                 //传入音频流中的采样率
-                audio = new WlAudio(playstatus, formatContext->streams[i]->codecpar->sample_rate);
+                audio = new WlAudio(playstatus, formatContext->streams[i]->codecpar->sample_rate, callJava);
                 audio->streamIndex = i;
 
                 audio->codecpar = formatContext->streams[i]->codecpar;
@@ -101,17 +101,17 @@ void WlFFmpeg::start() {
     //在解码之前是阻塞的，因此不影响性能
     audio->play();
 
-    int count = 0;
+    // int count = 0;
     //暂时写个死循环
     while (playstatus != NULL && !playstatus->exit) {
         //读取音频帧
         AVPacket *avPacket = av_packet_alloc();
         if (av_read_frame(formatContext, avPacket) == 0) {
             if (avPacket->stream_index == audio->streamIndex) {
-                count++;
-                if (LOG_DEBUG) {
-                    LOGE("解码第 %d 帧", count);
-                }
+                //   count++;
+                //   if (LOG_DEBUG) {
+                //      LOGE("解码第 %d 帧", count);
+                //  }
                 //释放资源
 //                av_packet_free(&avPacket);
 //                av_free(avPacket);
@@ -150,5 +150,17 @@ void WlFFmpeg::start() {
 //    }
     if (LOG_DEBUG) {
         LOGD("解码完成");
+    }
+}
+
+void WlFFmpeg::pause() {
+    if (audio != NULL) {
+        audio->pause();
+    }
+}
+
+void WlFFmpeg::resume() {
+    if (audio != NULL) {
+        audio->resume();
     }
 }

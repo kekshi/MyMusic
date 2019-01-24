@@ -20,6 +20,7 @@ public:
     jobject jobj;  //全局对象
     _JNIEnv *jniEnv;
     jmethodID jmid_parpared;
+    jmethodID jmid_load;
 
 public:
     WlCallJava(JavaVM *javaVM, JNIEnv *env, jobject *obj); //构造方法
@@ -29,6 +30,8 @@ public:
      *  type 线程类型
      */
     void onCallParpared(int type);
+
+    void onCallLoad(int type , bool load);
 };
 
 

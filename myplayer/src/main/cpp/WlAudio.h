@@ -12,6 +12,7 @@ extern "C" {
 
 #include "WlQueue.h"
 #include "WlPlaystatus.h"
+#include "WlCallJava.h"
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
@@ -23,6 +24,7 @@ public:
     AVCodecContext *avCodecContext = NULL;
     WlQueue *queue = NULL;
     WlPlaystatus *playstatus = NULL;
+    WlCallJava *callJava;
 
     //用来重采样的线程
     pthread_t thread_play;
@@ -48,11 +50,11 @@ public:
 
     //播放器相关对象
     SLObjectItf pcmPlayerObject = NULL;
-    SLPlayItf pclPlay = NULL;
+    SLPlayItf pcmPlay = NULL;
 
     SLAndroidSimpleBufferQueueItf pcmBufferQueue = NULL;
 public:
-    WlAudio(WlPlaystatus *playstatus,int sample_rate);
+    WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava);
 
     ~WlAudio();
 
@@ -64,6 +66,10 @@ public:
     void initOpenSLES();
 
     int getCurrentSampleReteForOpensles(int sample_rate);
+
+    void pause();
+
+    void resume();
 };
 
 

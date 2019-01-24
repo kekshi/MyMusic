@@ -15,12 +15,35 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mWlPlayer = WlPlayer()
-        mWlPlayer.setmWlOnParparedListener {
+        mWlPlayer.setWlOnParparedListener {
             MyLog.d("调用成功")
             mWlPlayer.start()
         }
+
+        mWlPlayer.setWlOnLoadListener {
+            if (it) {
+                MyLog.d("加载中。。。")
+            } else {
+                MyLog.d("播放中。。。")
+            }
+        }
+        mWlPlayer.setWlOnPauseResumeListener {
+            if (it) {
+                MyLog.d("暂停中。。。")
+            } else {
+                MyLog.d("播放中。。。")
+            }
+        }
         mBtnStart.setOnClickListener {
             begin()
+        }
+        //暂停
+        mBtnPause.setOnClickListener {
+            mWlPlayer.pause()
+        }
+        //重新播放
+        mBtnResume.setOnClickListener {
+            mWlPlayer.resume()
         }
     }
 

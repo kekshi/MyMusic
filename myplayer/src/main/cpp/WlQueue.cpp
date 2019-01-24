@@ -25,9 +25,9 @@ int WlQueue::putAVPacket(AVPacket *packet) {
     //加入队列
     queuePacket.push(packet);
 
-    if (LOG_DEBUG) {
-        LOGD("放入一个AVPacket到队列里面，个数为：%d", queuePacket.size());
-    }
+    //if (LOG_DEBUG) {
+    //    LOGD("放入一个AVPacket到队列里面，个数为：%d", queuePacket.size());
+    // }
     //通知消费者线程
     pthread_cond_signal(&condPacket);
     pthread_mutex_unlock(&mutexPacket);
@@ -50,9 +50,9 @@ int WlQueue::getAVPacket(AVPacket *packet) {
             av_packet_free(&avPacket);
             av_free(avPacket);
             avPacket == NULL;
-            if (LOG_DEBUG) {
-                LOGD("从列队中取出一个 avPacket ，还剩下 %d 个", queuePacket.size());
-            }
+            //  if (LOG_DEBUG) {
+            //     LOGD("从列队中取出一个 avPacket ，还剩下 %d 个", queuePacket.size());
+            //  }
             break;
         } else {
             //线程等待，此时会自动解锁

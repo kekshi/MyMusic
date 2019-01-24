@@ -5,6 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context=".MainActivity">
 
     <Button
@@ -13,4 +14,15 @@
             android:layout_height="wrap_content"
             android:text="开始"/>
 
+    <Button
+            android:id="@+id/mBtnPause"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="暂停"/>
+
+    <Button
+            android:id="@+id/mBtnResume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="播放"/>
 </LinearLayout>

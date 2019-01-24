@@ -4,11 +4,12 @@
 
 #include "WlAudio.h"
 
-WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate) {
+WlAudio::WlAudio(WlPlaystatus *playstatus, int sample_rate, WlCallJava *callJava) {
     this->playstatus = playstatus;
     queue = new WlQueue(playstatus);
     buffer = (uint8_t *) (av_malloc(sample_rate * 2 * 2));
     this->sample_rate = sample_rate;
+    this->callJava = callJava;
 }
 
 WlAudio::~WlAudio() {
@@ -35,6 +36,22 @@ int WlAudio::resampleAudio() {
 
     //如果没退出
     while (playstatus != NULL && !playstatus->exit) {
+
+        //队列没数据
+        if (queue->getQueueSize() == 0) {
+            //没加载
+            if (!playstatus->load) {
+                playstatus->load = true;
+                callJava->onCallLoad(CHILD_THREAD, true);
+            }
+            continue;
+        } else {
+            if (playstatus->load) {
+                playstatus->load = false;
+                callJava->onCallLoad(CHILD_THREAD, false);
+            }
+        }
+
         //avPacket 分配内存空间
         avPacket = av_packet_alloc();
         if (queue->getAVPacket(avPacket) != 0) {
@@ -100,9 +117,9 @@ int WlAudio::resampleAudio() {
 
 //            fwrite(buffer, 1, data_size, outFile);
 
-            if (LOG_DEBUG) {
-                LOGE("数据大小是 %d", data_size);
-            }
+            //    if (LOG_DEBUG) {
+            //       LOGE("数据大小是 %d", data_size);
+            //   }
 
             av_packet_free(&avPacket);
             av_free(avPacket);
@@ -187,14 +204,14 @@ void WlAudio::initOpenSLES() {
     (*engineItf)->CreateAudioPlayer(engineItf, &pcmPlayerObject, &slDataSource, &audioSink, 1, ids, req);
     (*pcmPlayerObject)->Realize(pcmPlayerObject, SL_BOOLEAN_FALSE);
     //得到播放器 player 接口实例
-    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_PLAY, &pclPlay);
+    (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_PLAY, &pcmPlay);
     //得到缓存列队 BufferQueue 实例
     (*pcmPlayerObject)->GetInterface(pcmPlayerObject, SL_IID_BUFFERQUEUE, &pcmBufferQueue);
     //通过 pcmBufferQueue 注册回调
     (*pcmBufferQueue)->RegisterCallback(pcmBufferQueue, pcmBufferCallback, this);
 
     //设置播放状态
-    (*pclPlay)->SetPlayState(pclPlay, SL_PLAYSTATE_PLAYING);
+    (*pcmPlay)->SetPlayState(pcmPlay, SL_PLAYSTATE_PLAYING);
     //执行一次回调
     pcmBufferCallback(pcmBufferQueue, this);
 }
@@ -246,4 +263,16 @@ int WlAudio::getCurrentSampleReteForOpensles(int sample_rate) {
             rate = SL_SAMPLINGRATE_44_1;
     }
     return rate;
+}
+
+void WlAudio::resume() {
+    if (pcmPlayerObject != NULL) {
+        (*pcmPlay)->SetPlayState(pcmPlay, SL_PLAYSTATE_PLAYING);
+    }
+}
+
+void WlAudio::pause() {
+    if (pcmPlayerObject != NULL) {
+        (*pcmPlay)->SetPlayState(pcmPlay, SL_PLAYSTATE_PAUSED);
+    }
 }
