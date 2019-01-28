@@ -54,6 +54,8 @@ void WlFFmpeg::decodeFFmpegThread() {
                 audio->streamIndex = i;
 
                 audio->codecpar = formatContext->streams[i]->codecpar;
+                audio->duration = formatContext->duration / AV_TIME_BASE;
+                audio->time_base = formatContext->streams[i]->time_base;
             }
         }
     }

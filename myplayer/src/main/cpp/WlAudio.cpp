@@ -120,6 +120,12 @@ int WlAudio::resampleAudio() {
             //    if (LOG_DEBUG) {
             //       LOGE("数据大小是 %d", data_size);
             //   }
+            now_time = avFrame->pts * av_q2d(time_base);
+
+            if (now_time < clock) {
+                now_time = clock;
+            }
+            clock = now_time;
 
             av_packet_free(&avPacket);
             av_free(avPacket);
@@ -152,6 +158,13 @@ void pcmBufferCallback(SLAndroidSimpleBufferQueueItf bf, void *context) {
     if (wlAudio != NULL) {
         int buffSize = wlAudio->resampleAudio();
         if (buffSize > 0) {
+            //计算播放时间
+            wlAudio->clock += buffSize / ((double) (wlAudio->sample_rate * 2 * 2));
+            if (wlAudio->clock - wlAudio->last_time >= wlAudio->threshold_time) {
+                wlAudio->last_time = wlAudio->clock;
+                //回调到java
+                wlAudio->callJava->onCallTimeInfo(CHILD_THREAD, wlAudio->clock, wlAudio->duration);
+            }
             //入队
             (*wlAudio->pcmBufferQueue)->Enqueue(wlAudio->pcmBufferQueue, (char *) wlAudio->buffer, buffSize);
         }

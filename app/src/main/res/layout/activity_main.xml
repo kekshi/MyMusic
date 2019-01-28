@@ -25,4 +25,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="播放"/>
+
+    <TextView
+            android:id="@+id/mTvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="00:00/00:00"/>
 </LinearLayout>

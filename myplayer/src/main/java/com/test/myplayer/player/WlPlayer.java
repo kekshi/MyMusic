@@ -1,9 +1,13 @@
 package com.test.myplayer.player;
 
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
+import com.test.myplayer.WlTimeInfo;
 import com.test.myplayer.listener.WlOnLoadListener;
 import com.test.myplayer.listener.WlOnParparedListener;
 import com.test.myplayer.listener.WlOnPauseResumeListener;
+import com.test.myplayer.listener.WlOnTimeInfoListener;
 import com.test.myplayer.log.MyLog;
 
 public class WlPlayer {
@@ -24,6 +28,8 @@ public class WlPlayer {
     private WlOnParparedListener mWlOnParparedListener;
     private WlOnLoadListener mWlOnLoadListener;
     private WlOnPauseResumeListener mWlOnPauseResumeListener;
+    private WlOnTimeInfoListener mWlOnTimeInfoListener;
+    private static WlTimeInfo mWlTimeInfo;
 
     public WlPlayer() {
     }
@@ -38,6 +44,10 @@ public class WlPlayer {
 
     public void setWlOnPauseResumeListener(WlOnPauseResumeListener wlOnPauseResumeListener) {
         this.mWlOnPauseResumeListener = wlOnPauseResumeListener;
+    }
+
+    public void setWlOnTimeInfoListener(WlOnTimeInfoListener mWlOnTimeInfoListener) {
+        this.mWlOnTimeInfoListener = mWlOnTimeInfoListener;
     }
 
     public void setSource(String source) {
@@ -100,6 +110,17 @@ public class WlPlayer {
     public void onCallLoad(boolean load) {
         if (mWlOnLoadListener != null) {
             mWlOnLoadListener.onCallLoad(load);
+        }
+    }
+
+    public void onCallTimeInfo(int currentTime, int totalTime) {
+        if (mWlOnTimeInfoListener != null) {
+            if (mWlTimeInfo == null) {
+                mWlTimeInfo = new WlTimeInfo();
+            }
+            mWlTimeInfo.setCurrentTime(currentTime);
+            mWlTimeInfo.setTotalTime(totalTime);
+            mWlOnTimeInfoListener.onTimeInfo(mWlTimeInfo);
         }
     }
 

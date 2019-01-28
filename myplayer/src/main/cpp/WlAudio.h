@@ -36,7 +36,18 @@ public:
     uint8_t *buffer = NULL;
     int data_size = 0;
     int sample_rate = 0;
+    //总时长
+    int duration = 0;
+    //基准时间
+    AVRational time_base;
+    //当前 AVframe 时间
+    double now_time = 0;
+    //当前时间
+    double clock = 0;
 
+    double last_time = 0;
+    //阈值
+    double threshold_time = 0.1;
 
     //OpenSL ES 相关变量
     //引擎接口对象实例

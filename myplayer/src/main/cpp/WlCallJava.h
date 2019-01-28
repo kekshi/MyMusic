@@ -21,6 +21,7 @@ public:
     _JNIEnv *jniEnv;
     jmethodID jmid_parpared;
     jmethodID jmid_load;
+    jmethodID jmid_timeinfo;
 
 public:
     WlCallJava(JavaVM *javaVM, JNIEnv *env, jobject *obj); //构造方法
@@ -31,7 +32,9 @@ public:
      */
     void onCallParpared(int type);
 
-    void onCallLoad(int type , bool load);
+    void onCallLoad(int type, bool load);
+
+    void onCallTimeInfo(int type, int curr, int total);
 };
 
 
